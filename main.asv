@@ -9,7 +9,8 @@ len_skm = 70;        % 水印投影方向数
 L = 50;              % 水印比特数
 Delta=0.5;
 
-[x, fs] = audioread('original_audio.wav');                             % 读取音频文件,audioread函数会自动完成归一化，所以在计算PSNR峰值信噪比的时候应该用1来计算
+
+[x, fs] = audioread('A2_0.wav');                             % 读取音频文件,audioread函数会自动完成归一化，所以在计算PSNR峰值信噪比的时候应该用1来计算
 fprintf('音频长度: %d 个样本, 采样率: %d Hz\n', length(x), fs);
 if size(x, 2) > 1
     x = mean(x, 2);                                          % 对左右声道取平均
@@ -53,10 +54,7 @@ for j = 1:M_D
 end
 c_dwt = c_dwt + em_q;
 
-x_encrypted = idwt(c_dwt, cd1, 'db1');                       % 逆恢复加密音频
-warning('off', 'MATLAB:audiovideo:audiowrite:dataClipped');
-audiowrite('encrypted_audio.wav', x_encrypted, fs);          % 保存加密音频
-fprintf('加密音频已保存为: encrypted_audio.wav\n');
+x_encryption = idwt(c)
 % 联合解密与水印
 b_k = randi([0,1],L,1);                                      % 生成L位0-1随机比特
 m_k = 2 * b_k - 1;
@@ -72,15 +70,11 @@ for j = 1:M_D
     m_emb_dwt = m_emb_dwt + pad_d(j) * S(:, j);              %S大小为M*M_D，总投影方向有M_D=100个
 end
 
+% 计算音频质量指标
 x_watermarked = idwt(m_emb_dwt, cd1, 'db1');                 % 逆DWT恢复音频
-audiowrite('watermarked_audio.wav', x_watermarked, fs);      % 保存水印音频
-fprintf('水印音频已保存为: watermarked.wav\n');
-mse_value = mean((x - x_watermarked).^2);                    % 计算音频质量指标
+mse_value = mean((x - x_watermarked).^2);
 psnr_value = 20 * log10(1.0 / sqrt(mse_value));
 fprintf('水印音频PSNR: %.2f dB\n', psnr_value);
-% 保存水印音频
-audiowrite('watermarked_audio.wav', x_watermarked, fs);
-fprintf('水印音频已保存为: watermarked.wav\n');
 
 % 水印检测
 [ca1_emb, ~] = dwt(x_watermarked, 'db1');                    % 对含水印音频进行DWT变换
@@ -107,10 +101,11 @@ else
     fprintf('\n无噪声情况下水印提取失败\n');
 end
 
+% 保存水印音频
+audiowrite('watermarked_audio.wav', x_watermarked, fs);
+fprintf('水印音频已保存为: watermarked.wav\n');
 % 播放对比
-% fprintf("播放原始音频.................\n");
-% sound(x, fs); pause(length(x)/fs + 2);
-% fprintf("播放水印音频.................\n");
-% sound(x_watermarked, fs);
-% fprintf("播放加密音频.................\n");
-% sound(x_encrypted, fs);
+fprintf("播放原始音频.................\n");
+sound(x, fs); pause(length(x)/fs + 2);
+fprintf("播放水印音频.................\n");
+sound(x_watermarked, fs);
