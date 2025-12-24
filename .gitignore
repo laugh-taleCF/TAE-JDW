@@ -1,2 +1,2 @@
-*.mat      % 不传数据文件
-*.asv      % 不传MATLAB自动保存文件
+*.asv
+*.mat
