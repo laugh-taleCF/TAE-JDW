@@ -19,11 +19,11 @@
 2. 按照提示操作
 
 ## 依赖
-- MATLAB R2020a或更高版本
+- MATLAB R2021或更高版本
 - 信号处理工具箱
 
 ## 作者
-[你的名字]
+laugh-taleCF
 
 ## 许可证
 MIT License
